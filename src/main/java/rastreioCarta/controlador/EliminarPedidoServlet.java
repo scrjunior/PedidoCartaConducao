@@ -14,10 +14,9 @@ import rastreioCarta.DB.DB;
 public class EliminarPedidoServlet extends HttpServlet {
 
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pedidoIdStr = request.getParameter("id");
-        System.out.println("Received delete request with ID: " + pedidoIdStr);
-        
+
         if (pedidoIdStr == null || pedidoIdStr.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.getWriter().println("ID do pedido não fornecido.");
@@ -26,13 +25,10 @@ public class EliminarPedidoServlet extends HttpServlet {
 
         try {
             int pedidoId = Integer.parseInt(pedidoIdStr);
-
-            Connection conn = null;
+            Connection conn = DB.getConnection();
             PreparedStatement stmt = null;
 
             try {
-                conn = DB.getConnection();
-
                 // Delete the pedido from the database
                 String deleteQuery = "DELETE FROM pedido_carteira WHERE id = ?";
                 stmt = conn.prepareStatement(deleteQuery);
@@ -42,7 +38,7 @@ public class EliminarPedidoServlet extends HttpServlet {
                 if (rowsAffected > 0) {
                     // Pedido successfully deleted
                     response.setStatus(HttpServletResponse.SC_OK);
-                    response.getWriter().println("Pedido eliminado com sucesso.");
+                    response.sendRedirect("MotoristaAdmin.jsp");
                 } else {
                     // No pedido found with the specified ID
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);

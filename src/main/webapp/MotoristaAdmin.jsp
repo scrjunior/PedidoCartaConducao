@@ -62,7 +62,8 @@
                 <th>Tipo de Pedido</th>
                 <th>Data do Pedido</th>
                 <th>Data de Levantamento</th>
-                <th>Editar</th> <!-- New column for Edit button -->
+                <th>Editar</th> 
+                <th>Eliminar</th><!-- New column for Edit button -->
             </tr>
         </thead>
         <tbody id="pedidosTableBody">
@@ -137,6 +138,37 @@
         </div>
     </div>
 </div>
+
+<div class="modal" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Eliminação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja eliminar este pedido?</p>
+                <form id="deletePedidoForm" action="eliminarPedido" method="POST">
+                    <div class="mb-3">
+                        
+                        <input type="hidden" id="pedidoIdToDelete" name="id">
+                        <!-- Hidden input to store the pedido ID -->
+                    </div>
+                    <!-- Buttons within the form -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <!-- Use type="submit" to trigger form submission -->
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 
 
     </div>
@@ -297,34 +329,47 @@
     	    console.error('Erro ao carregar dados do pedido:', error);
     	  }
     	}
-
-		
+    
     async function eliminarPedido(pedidoId) {
-        try {
-            // Make a DELETE request to your backend to delete the pedido
-            const response = await axios.delete(`eliminarPedido?id=${pedidoId}`);
-            const pedido = pedidos.find(p => p.id === pedidoId);
-            
+        // Set the value of the hidden input field with the pedido ID
+        document.getElementById('pedidoIdToDelete').value = pedidoId;
 
-            // Optionally, handle success (e.g., remove the deleted pedido from the UI)
-            if (response.status === 200) {
-                // Find and remove the deleted pedido's row from the table
-                const rowToRemove = document.getElementById(`pedido-${pedidoId}`);
-                if (rowToRemove) {
-                    rowToRemove.remove();
+        // Display the delete modal
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        deleteModal.show();
+
+        // Handle form submission when the "Eliminar" button in the modal is clicked
+        const eliminarButton = document.getElementById('confirmEliminarButton');
+        eliminarButton.addEventListener('click', async () => {
+            try {
+                const deleteForm = document.getElementById('deletePedidoForm');
+                const formData = new FormData(deleteForm);
+
+                const response = await axios.post('eliminarPedido', formData);
+                if (response.status === 200) {
+                    // Reload or update the table upon successful deletion
+                    carregarPedidos();
+                } else {
+                    console.error('Erro ao eliminar pedido:', response.data);
                 }
-            } else {
-                console.error('Failed to delete pedido.');
+            } catch (error) {
+                console.error('Erro ao eliminar pedido:', error);
             }
-        } catch (error) {
-            console.error('Erro ao eliminar pedido:', error);
-        }
+
+            // Hide the delete modal after form submission
+            deleteModal.hide();
+        });
     }
 
 
 
 
 
+    
+    
+
+		
+  
 
     // Ensure carregarPedidos is called after the DOM content is loaded
     document.addEventListener('DOMContentLoaded', () => {
