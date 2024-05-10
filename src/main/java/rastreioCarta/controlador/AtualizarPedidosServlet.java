@@ -22,6 +22,7 @@ public class AtualizarPedidosServlet extends HttpServlet {
         String tipoPedido = request.getParameter("tipoPedido");
         String dataPedido = request.getParameter("dataPedido");
         String dataLevantamento = request.getParameter("dataLevantamento");
+        String status = request.getParameter("status");
 
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -32,7 +33,7 @@ public class AtualizarPedidosServlet extends HttpServlet {
             // Note: I assume you need to update both the 'motorista' and 'pedido_carteira' tables. 
             // If not, adjust the query and which fields it includes.
             String updateQuery = "UPDATE motorista m JOIN pedido_carteira pc ON m.id = pc.motorista_id SET " +
-                                 "m.nome = ?, m.apelido = ?, pc.tipo_pedido = ?, pc.data_pedido = ?, m.data_de_levantamento = ? " +
+                                 "m.nome = ?, m.apelido = ?, pc.tipo_pedido = ?, pc.data_pedido = ?, m.data_de_levantamento = ?, pc.status = ? " +
                                  "WHERE pc.id = ?";
 
             stmt = conn.prepareStatement(updateQuery);
@@ -41,7 +42,9 @@ public class AtualizarPedidosServlet extends HttpServlet {
             stmt.setString(3, tipoPedido);
             stmt.setString(4, dataPedido);
             stmt.setString(5, dataLevantamento);
-            stmt.setInt(6, pedidoId); 
+            stmt.setString(6, status);
+            stmt.setInt(7, pedidoId);
+            
             stmt.executeUpdate();
 
             // Success Handling

@@ -25,7 +25,7 @@ public class ConsultarPedidosServlet extends HttpServlet {
         response.setContentType("application/json");
 
         try (Connection conn = DB.getConnection()) {
-            String query = "SELECT pc.id, m.nome, m.apelido, pc.tipo_pedido, pc.data_pedido, m.data_de_levantamento " +
+            String query = "SELECT pc.id, m.nome, m.apelido, pc.tipo_pedido, pc.data_pedido, m.data_de_levantamento, pc.status " +
                            "FROM pedido_carteira pc " +
                            "JOIN motorista m ON pc.motorista_id = m.id";
 
@@ -40,8 +40,9 @@ public class ConsultarPedidosServlet extends HttpServlet {
                 String tipoPedido = rs.getString("tipo_pedido");
                 String dataPedido = rs.getString("data_pedido");
                 String dataLevantamento = rs.getString("data_de_levantamento");
+                String status = rs.getString("status");
 
-                Pedido pedido = new Pedido(id, nomeMotorista, apelidoMotorista, tipoPedido, dataPedido, dataLevantamento);
+                Pedido pedido = new Pedido(id, nomeMotorista, apelidoMotorista, tipoPedido, dataPedido, dataLevantamento, status);
                 pedidos.add(pedido);
             }
 
@@ -64,14 +65,16 @@ public class ConsultarPedidosServlet extends HttpServlet {
         private String tipoPedido;
         private String dataPedido;
         private String dataLevantamento;
+        private String status;
 
-        public Pedido(int id, String nomeMotorista, String apelidoMotorista, String tipoPedido, String dataPedido, String dataLevantamento) {
+        public Pedido(int id, String nomeMotorista, String apelidoMotorista, String tipoPedido, String dataPedido, String dataLevantamento, String status) {
             this.id = id;
             this.nomeMotorista = nomeMotorista;
             this.apelidoMotorista = apelidoMotorista;
             this.tipoPedido = tipoPedido;
             this.dataPedido = dataPedido;
             this.dataLevantamento = dataLevantamento;
+            this.status = status;
         }
     }
 }

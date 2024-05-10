@@ -21,6 +21,24 @@ public class InserirPedidoServlet extends HttpServlet {
         String tipoPedido = request.getParameter("tipoPedido");
         String dataPedido = request.getParameter("dataPedido");
         String dataLevantamento = request.getParameter("dataLevantamento");
+        String cartNumStr = request.getParameter("cartNum");
+        long cartNum; // Use long instead of int for large numbers
+
+     // Verifica se a string contém apenas dígitos antes de converter para long
+     if (cartNumStr != null && cartNumStr.matches("\\d+")) {
+         try {
+             cartNum = Long.parseLong(cartNumStr); // Use Long.parseLong for large numbers
+         } catch (NumberFormatException e) {
+             response.getWriter().println("Número de identificação inválido: " + cartNumStr);
+             return; // Retorna ou lança uma exceção, dependendo do tratamento desejado
+         }
+     } else {
+         // Se a string não contiver apenas dígitos, trate o erro aqui
+         response.getWriter().println("Número de identificação inválido: " + cartNumStr);
+         return; // Retorna ou lança uma exceção, dependendo do tratamento desejado
+     }
+
+
 
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -43,11 +61,12 @@ public class InserirPedidoServlet extends HttpServlet {
                 }
             }
 
-            String insertPedidoQuery = "INSERT INTO pedido_carteira (motorista_id, tipo_pedido, data_pedido) VALUES (?, ?, ?)";
+            String insertPedidoQuery = "INSERT INTO pedido_carteira (motorista_id, tipo_pedido, data_pedido, cartNum) VALUES (?, ?, ?, ?)";
             stmt = conn.prepareStatement(insertPedidoQuery);
             stmt.setInt(1, motoristaId);
             stmt.setString(2, tipoPedido);
             stmt.setString(3, dataPedido);
+            stmt.setLong(4, cartNum);
             stmt.executeUpdate();
 
             
